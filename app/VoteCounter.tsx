@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Confetti } from './Confetti'
+import { PlusCircle, Vote, RotateCcw, CheckCircle2, Trophy } from 'lucide-react'
 
 interface Candidate {
   name: string
@@ -52,10 +53,10 @@ export default function VoteCounter() {
   }
 
   return (
-    <div className="container mx-auto p-4 min-h-screen bg-gradient-to-b from-blue-100 to-purple-100">
+    <div className="container mx-auto p-8 min-h-screen bg-gray-50">
       <motion.h1 
-        className="text-4xl font-bold mb-8 text-center text-blue-600"
-        initial={{ opacity: 0, y: -50 }}
+        className="text-4xl font-light mb-12 text-center text-gray-800"
+        initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
@@ -63,8 +64,8 @@ export default function VoteCounter() {
       </motion.h1>
       
       <motion.div 
-        className="mb-8 flex gap-2 justify-center"
-        initial={{ opacity: 0, y: 50 }}
+        className="mb-12 flex gap-4 justify-center"
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
@@ -72,10 +73,15 @@ export default function VoteCounter() {
           type="text"
           value={newCandidate}
           onChange={(e) => setNewCandidate(e.target.value)}
-          placeholder="Nom du candidat"
-          className="max-w-sm"
+          placeholder="Nom proposé"
+          className="max-w-sm border-gray-300"
         />
-        <Button onClick={addCandidate} className="bg-blue-500 hover:bg-blue-600">Ajouter un nom</Button>
+        <Button 
+          onClick={addCandidate} 
+          className="bg-gray-800 hover:bg-gray-700 text-white transition-colors duration-200"
+        >
+          <PlusCircle className="mr-2 h-4 w-4" /> Ajouter
+        </Button>
       </motion.div>
 
       <motion.div 
@@ -88,32 +94,32 @@ export default function VoteCounter() {
           {candidates.map((candidate, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <Card className="overflow-hidden">
-                <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-500">
-                  <CardTitle className="text-white">{candidate.name}</CardTitle>
+              <Card className="overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
+                <CardHeader className="bg-gray-100 p-4">
+                  <CardTitle className="text-gray-800 text-lg font-medium">{candidate.name}</CardTitle>
                 </CardHeader>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4 mb-4">
+                <CardContent className="p-4 bg-white">
+                  <div className="flex items-center justify-between gap-4 mb-4">
                     <Input
                       type="number"
                       value={candidate.votes}
                       onChange={(e) => setVotes(index, parseInt(e.target.value))}
                       disabled={isVotingClosed}
-                      className="w-24"
+                      className="w-20 text-center font-medium border-gray-300"
                     />
-                    <span className="text-lg font-semibold">votes</span>
+                    <span className="text-sm font-medium text-gray-600">votes</span>
                   </div>
                   <Button 
                     onClick={() => vote(index)} 
                     disabled={isVotingClosed}
-                    className="w-full bg-purple-500 hover:bg-purple-600"
+                    className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 transition-colors duration-200"
                   >
-                    Voter
+                    <Vote className="mr-2 h-4 w-4" /> Voter
                   </Button>
                 </CardContent>
               </Card>
@@ -123,44 +129,68 @@ export default function VoteCounter() {
       </motion.div>
 
       <motion.div 
-        className="mt-8 flex gap-4 justify-center"
-        initial={{ opacity: 0, y: 50 }}
+        className="mt-12 flex gap-4 justify-center"
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.6 }}
       >
         <Button 
           onClick={endVoting} 
           disabled={isVotingClosed || candidates.length === 0}
-          className="bg-green-500 hover:bg-green-600"
+          className="bg-gray-800 hover:bg-gray-700 text-white transition-colors duration-200"
         >
-          Terminer le vote
+          <CheckCircle2 className="mr-2 h-4 w-4" /> Terminer
         </Button>
         <Button 
           onClick={resetVotes} 
           variant="outline" 
           disabled={isVotingClosed}
-          className="border-red-500 text-red-500 hover:bg-red-50"
+          className="border-gray-300 text-gray-600 hover:bg-gray-100 transition-colors duration-200"
         >
-          Réinitialiser les votes
+          <RotateCcw className="mr-2 h-4 w-4" /> Réinitialiser
         </Button>
       </motion.div>
 
       <AnimatePresence>
         {isVotingClosed && winner && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5 }}
+            className="mt-12"
           >
-            <Card className="mt-8 bg-gradient-to-r from-yellow-400 to-orange-500">
-              <CardHeader>
-                <CardTitle className="text-white text-center text-2xl">Résultat du vote</CardTitle>
+            <Card className="overflow-hidden shadow-lg bg-white border-2 border-gray-800">
+              <CardHeader className="bg-gray-800 text-white p-6">
+                <CardTitle className="text-center text-3xl font-light flex items-center justify-center">
+                  <Trophy className="mr-2 h-6 w-6" /> Résultat du vote
+                </CardTitle>
               </CardHeader>
-              <CardContent className="p-6">
-                <p className="text-white text-center text-xl">
-                  Le gagnant est : <strong className="text-2xl">{winner.name}</strong> avec {winner.votes} votes
-                </p>
+              <CardContent className="p-8">
+                <motion.p 
+                  className="text-gray-800 text-center"
+                  initial={{ scale: 0.9 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                >
+                  Le gagnant est :
+                  <motion.strong 
+                    className="text-4xl block mt-4 mb-2 font-bold text-gray-900"
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.4 }}
+                  >
+                    {winner.name}
+                  </motion.strong>
+                  <motion.span 
+                    className="block text-2xl font-medium text-gray-700"
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.6 }}
+                  >
+                    avec {winner.votes} votes
+                  </motion.span>
+                </motion.p>
               </CardContent>
             </Card>
             <Confetti />
