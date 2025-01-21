@@ -1,4 +1,4 @@
-<div align="center">
+        <div align="center">
   <h1>🗳️ Vote Counter</h1>
   <p>A modern voting application built with Next.js</p>
 </div>
@@ -14,7 +14,7 @@
 ## 📸 Screenshots
 
 ### Database Schema
-![Database Schema]![image](https://github.com/user-attachments/assets/e082a5eb-09c0-43ec-9e59-b5afd1f878ae)
+![image](https://github.com/user-attachments/assets/e082a5eb-09c0-43ec-9e59-b5afd1f878ae)
 *PostgreSQL database schema managed by Prisma*
 
 ### Application Interface
