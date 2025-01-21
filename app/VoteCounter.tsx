@@ -1,60 +1,66 @@
 "use client"
 
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Confetti } from './Confetti'
-import { PlusCircle, Vote, RotateCcw, CheckCircle2, Trophy } from 'lucide-react'
+import { Confetti } from "./Confetti"
+import { PlusCircle, Vote, RotateCcw, CheckCircle2, Trophy } from "lucide-react"
+import { addCandidate, getCandidates, voteForCandidate, resetVotes, endVoting } from "./actions"
 
 interface Candidate {
+  id: number
   name: string
   votes: number
 }
 
 export default function VoteCounter() {
   const [candidates, setCandidates] = useState<Candidate[]>([])
-  const [newCandidate, setNewCandidate] = useState('')
+  const [newCandidate, setNewCandidate] = useState("")
   const [isVotingClosed, setIsVotingClosed] = useState(false)
   const [winner, setWinner] = useState<Candidate | null>(null)
 
-  const addCandidate = () => {
-    if (newCandidate.trim() !== '') {
-      setCandidates([...candidates, { name: newCandidate, votes: 0 }])
-      setNewCandidate('')
+  useEffect(() => {
+    const fetchCandidates = async () => {
+      const fetchedCandidates = await getCandidates()
+      setCandidates(fetchedCandidates)
+    }
+    fetchCandidates()
+  }, [])
+
+  const handleAddCandidate = async () => {
+    if (newCandidate.trim() !== "") {
+      await addCandidate(newCandidate)
+      const updatedCandidates = await getCandidates()
+      setCandidates(updatedCandidates)
+      setNewCandidate("")
     }
   }
 
-  const vote = (index: number) => {
-    const updatedCandidates = [...candidates]
-    updatedCandidates[index].votes += 1
+  const handleVote = async (id: number) => {
+    await voteForCandidate(id)
+    const updatedCandidates = await getCandidates()
     setCandidates(updatedCandidates)
   }
 
-  const setVotes = (index: number, votes: number) => {
-    const updatedCandidates = [...candidates]
-    updatedCandidates[index].votes = Math.max(0, votes)
-    setCandidates(updatedCandidates)
-  }
-
-  const endVoting = () => {
+  const handleEndVoting = async () => {
+    const result = await endVoting()
     setIsVotingClosed(true)
-    const winningCandidate = candidates.reduce((prev, current) => 
-      (prev.votes > current.votes) ? prev : current
-    )
-    setWinner(winningCandidate)
+    setWinner(result)
   }
 
-  const resetVotes = () => {
-    setCandidates(candidates.map(candidate => ({ ...candidate, votes: 0 })))
+  const handleResetVotes = async () => {
+    await resetVotes()
+    const updatedCandidates = await getCandidates()
+    setCandidates(updatedCandidates)
     setIsVotingClosed(false)
     setWinner(null)
   }
 
   return (
     <div className="container mx-auto p-8 min-h-screen bg-gray-50">
-      <motion.h1 
+      <motion.h1
         className="text-4xl font-light mb-12 text-center text-gray-800"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -62,8 +68,8 @@ export default function VoteCounter() {
       >
         Nom de la promotion 2025
       </motion.h1>
-      
-      <motion.div 
+
+      <motion.div
         className="mb-12 flex gap-4 justify-center"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -73,27 +79,27 @@ export default function VoteCounter() {
           type="text"
           value={newCandidate}
           onChange={(e) => setNewCandidate(e.target.value)}
-          placeholder="Nom proposé"
+          placeholder="Nom du candidat"
           className="max-w-sm border-gray-300"
         />
-        <Button 
-          onClick={addCandidate} 
+        <Button
+          onClick={handleAddCandidate}
           className="bg-gray-800 hover:bg-gray-700 text-white transition-colors duration-200"
         >
           <PlusCircle className="mr-2 h-4 w-4" /> Ajouter
         </Button>
       </motion.div>
 
-      <motion.div 
+      <motion.div
         className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.4 }}
       >
         <AnimatePresence>
-          {candidates.map((candidate, index) => (
+          {candidates.map((candidate) => (
             <motion.div
-              key={index}
+              key={candidate.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
@@ -108,14 +114,13 @@ export default function VoteCounter() {
                     <Input
                       type="number"
                       value={candidate.votes}
-                      onChange={(e) => setVotes(index, parseInt(e.target.value))}
-                      disabled={isVotingClosed}
+                      readOnly
                       className="w-20 text-center font-medium border-gray-300"
                     />
                     <span className="text-sm font-medium text-gray-600">votes</span>
                   </div>
-                  <Button 
-                    onClick={() => vote(index)} 
+                  <Button
+                    onClick={() => handleVote(candidate.id)}
                     disabled={isVotingClosed}
                     className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 transition-colors duration-200"
                   >
@@ -128,22 +133,22 @@ export default function VoteCounter() {
         </AnimatePresence>
       </motion.div>
 
-      <motion.div 
+      <motion.div
         className="mt-12 flex gap-4 justify-center"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.6 }}
       >
-        <Button 
-          onClick={endVoting} 
+        <Button
+          onClick={handleEndVoting}
           disabled={isVotingClosed || candidates.length === 0}
           className="bg-gray-800 hover:bg-gray-700 text-white transition-colors duration-200"
         >
           <CheckCircle2 className="mr-2 h-4 w-4" /> Terminer
         </Button>
-        <Button 
-          onClick={resetVotes} 
-          variant="outline" 
+        <Button
+          onClick={handleResetVotes}
+          variant="outline"
           disabled={isVotingClosed}
           className="border-gray-300 text-gray-600 hover:bg-gray-100 transition-colors duration-200"
         >
@@ -167,14 +172,14 @@ export default function VoteCounter() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-8">
-                <motion.p 
+                <motion.p
                   className="text-gray-800 text-center"
                   initial={{ scale: 0.9 }}
                   animate={{ scale: 1 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
                 >
                   Le gagnant est :
-                  <motion.strong 
+                  <motion.strong
                     className="text-4xl block mt-4 mb-2 font-bold text-gray-900"
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
@@ -182,7 +187,7 @@ export default function VoteCounter() {
                   >
                     {winner.name}
                   </motion.strong>
-                  <motion.span 
+                  <motion.span
                     className="block text-2xl font-medium text-gray-700"
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
