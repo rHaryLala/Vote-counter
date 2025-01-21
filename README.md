@@ -19,7 +19,7 @@
 *PostgreSQL database schema managed by Prisma*
 
 ### Application Interface
-![App Interface]![image](https://github.com/user-attachments/assets/0cdc058a-72d0-4b5a-9711-5c6eb47d5539)
+![image](https://github.com/user-attachments/assets/0cdc058a-72d0-4b5a-9711-5c6eb47d5539)
 
 *Main voting interface*
 
