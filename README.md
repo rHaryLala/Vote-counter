@@ -1,4 +1,3 @@
-        <div align="center">
   <h1>🗳️ Vote Counter</h1>
   <p>A modern voting application built with Next.js</p>
 </div>
