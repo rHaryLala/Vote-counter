@@ -14,11 +14,11 @@
 ## 📸 Screenshots
 
 ### Database Schema
-![Database Schema](screenshots/database-schema.png)
+![Database Schema]![image](https://github.com/user-attachments/assets/e082a5eb-09c0-43ec-9e59-b5afd1f878ae)
 *PostgreSQL database schema managed by Prisma*
 
 ### Application Interface
-![App Interface](screenshots/app-interface.png)
+![App Interface]![image](https://github.com/user-attachments/assets/0cdc058a-72d0-4b5a-9711-5c6eb47d5539)
 *Main voting interface*
 
 ## 🚀 Getting Started
@@ -45,11 +45,10 @@ This project uses [Prisma](https://prisma.io) as the ORM with PostgreSQL. Here's
 
 ```prisma
 // Example schema
-model Vote {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  option    String
-  count     Int      @default(1)
+model Candidate {
+  id    Int    @id @default(autoincrement())
+  name  String
+  votes Int    @default(0)
 }
 ```
 
